@@ -1,0 +1,32 @@
+# base-image for python on any machine using a template variable,
+# see more about dockerfile templates here: https://www.balena.io/docs/learn/develop/dockerfile/
+FROM balenalib/%%BALENA_MACHINE_NAME%%-ubuntu-python:run
+
+# use `install_packages` if you need to install dependencies,
+# for instance if you need git, just uncomment the line below.
+RUN install_packages openalpr openalpr-daemon openalpr-utils libopenalpr-dev
+
+# Check python version
+RUN python -V
+
+# Set our working directory
+WORKDIR /usr/src/app
+
+# This will copy all files in our root to the working  directory in the container
+COPY . ./
+
+# Install python support packages
+RUN install_packages python-urllib3 python-ipaddr python-retrying python-packaging python-progress python-requests python-cachecontrol python-lockfile python-distlib python-html5lib
+
+# Install OpenALPR
+RUN pip install openalpr
+
+# Copy ALPR training data as it seems to go into the wrong place and the ENVVAR doesn't work
+RUN cp /usr/share/openalpr/runtime_data/ocr/tessdata/* /usr/share/openalpr/runtime_data/ocr
+
+# Enable udevd so that plugged dynamic hardware devices show up in our container.
+ENV UDEV=1
+
+# Sit and wait
+CMD ["sleep","infinity"]
+
