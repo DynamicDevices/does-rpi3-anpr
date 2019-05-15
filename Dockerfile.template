@@ -22,6 +22,7 @@ RUN pip install openalpr
 
 # Install mjpeg-streamer
 RUN install_packages git build-essential cmake python-imaging libjpeg-dev
+RUN install_packages libraspberrypi-dev
 RUN cd ~ && git clone https://github.com/jacksonliam/mjpg-streamer.git
 RUN cd ~/mjpg-streamer/mjpg-streamer-experimental && make CMAKE_BUILD_TYPE=Debug && make install
 
@@ -34,9 +35,15 @@ COPY . ./
 # Copy ALPR training data as it seems to go into the wrong place and the ENVVAR doesn't work
 RUN cp /usr/share/openalpr/runtime_data/ocr/tessdata/* /usr/share/openalpr/runtime_data/ocr
 
+# Copy ALPR config across
+COPY alprd.conf /etc/openalpr/alprd.conf
+
+# Link /www to mjpg-streamer resources
+RUN ln -s /root/mjpg-streamer/mjpg-streamer-experimental/www /www
+
 # Enable udevd so that plugged dynamic hardware devices show up in our container.
 ENV UDEV=1
 
 # Sit and wait
-CMD ["sleep","infinity"]
+CMD ["/bin/bash","start.sh"]
 
