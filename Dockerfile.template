@@ -20,6 +20,11 @@ RUN pip install --upgrade pip setuptools
 # Install OpenALPR
 RUN pip install openalpr
 
+# Install mjpeg-streamer
+RUN install_packages git build-essential cmake python-imaging libjpeg-dev
+RUN cd ~ && git clone https://github.com/jacksonliam/mjpg-streamer.git
+RUN cd ~/mjpg-streamer/mjpg-streamer-experimental && make CMAKE_BUILD_TYPE=Debug && make install
+
 # Set our working directory
 WORKDIR /usr/src/app
 
