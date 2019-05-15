@@ -1,25 +1,30 @@
 # base-image for python on any machine using a template variable,
 # see more about dockerfile templates here: https://www.balena.io/docs/learn/develop/dockerfile/
-FROM balenalib/%%BALENA_MACHINE_NAME%%-ubuntu-python:run
+#FROM balenalib/%%BALENA_MACHINE_NAME%%-ubuntu-python:run
+FROM balenalib/%%BALENA_MACHINE_NAME%%-debian-python:run
 
 # use `install_packages` if you need to install dependencies,
 # for instance if you need git, just uncomment the line below.
 RUN install_packages openalpr openalpr-daemon openalpr-utils libopenalpr-dev
 
-# Check python version
+# Check python version (2.7)
 RUN python -V
+
+# Install python support packages
+RUN install_packages python-urllib3 python-ipaddr python-retrying python-packaging python-progress python-requests python-cachecontrol python-lockfile python-distlib python-html5lib
+
+# Make sure we don't have a bad setuptools
+RUN install_packages python-setuptools
+RUN pip install --upgrade pip setuptools
+
+# Install OpenALPR
+RUN pip install openalpr
 
 # Set our working directory
 WORKDIR /usr/src/app
 
 # This will copy all files in our root to the working  directory in the container
 COPY . ./
-
-# Install python support packages
-RUN install_packages python-urllib3 python-ipaddr python-retrying python-packaging python-progress python-requests python-cachecontrol python-lockfile python-distlib python-html5lib
-
-# Install OpenALPR
-RUN pip install openalpr
 
 # Copy ALPR training data as it seems to go into the wrong place and the ENVVAR doesn't work
 RUN cp /usr/share/openalpr/runtime_data/ocr/tessdata/* /usr/share/openalpr/runtime_data/ocr

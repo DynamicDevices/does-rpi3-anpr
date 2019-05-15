@@ -1,4 +1,4 @@
-# DoES RPi3 ANPR
+# DoES RPi3/RPi0 ANPR
 
 Balena.io container for testing ANPR number-plate recognition
 
